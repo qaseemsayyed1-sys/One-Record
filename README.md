@@ -1,6 +1,6 @@
 # One-Record
 This is a secure place for medical records
 <br>
-No more scattered info.
+<b>No more scattered info</b>
 <br>
-One Record - Every Person, Every Detail
+<b>One Record - Every Person, Every Detail</b>
