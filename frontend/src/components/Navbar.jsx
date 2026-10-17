@@ -26,8 +26,9 @@ export default function Navbar({ onOpenChat }) {
               onClick={onOpenChat}
               className="nav__ai-btn"
               title="Open AI Chat"
+              style={{ fontSize: "18px" }} // Emoji ke liye font size thoda bada kiya
             >
-              AI
+              🦖
             </button>
           )}
           {!user && (

@@ -918,27 +918,26 @@ input, textarea, select {
 }
 
 .nav__ai-btn {
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: var(--terracotta);
+  background: var(--beige-2);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
-  font-weight: 700;
-  font-family: var(--font-mono);
-  letter-spacing: 0.05em;
-  border: none;
+  font-size: 20px;
+  border: 2px solid var(--terracotta);
   cursor: pointer;
   margin-right: 12px;
   box-shadow: 0 2px 8px rgba(46, 125, 50, 0.3);
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
+  padding: 0;
 }
 
 .nav__ai-btn:hover {
-  transform: scale(1.1);
+  transform: scale(1.1) rotate(-10deg);
+  background: var(--terracotta);
 }
 
 .scanner-layout {
