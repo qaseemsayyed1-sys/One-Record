@@ -1056,3 +1056,75 @@ input, textarea, select {
   color: #2E5A39;
   border: 1px solid rgba(74, 124, 89, 0.2);
 }
+.prescription-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .prescription-grid { grid-template-columns: 1fr; }
+}
+
+.rx-card {
+  padding: 26px 24px;
+  background: var(--cream);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(212, 198, 172, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: all 0.2s ease;
+}
+
+.rx-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+
+.rx-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rx-card__badge {
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(180, 91, 62, 0.1);
+  color: var(--terracotta);
+  letter-spacing: 0.14em;
+}
+
+.rx-card__med {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.rx-card__salt {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--sage-d);
+}
+
+.rx-card__msg {
+  font-size: 14px;
+  line-height: 1.55;
+  padding: 14px 16px;
+  background: var(--beige-2);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+}
+
+.rx-card__foot {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}

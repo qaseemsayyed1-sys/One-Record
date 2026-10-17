@@ -12,7 +12,7 @@ const TABS = [
 export default function DoctorDashboard() {
   const { user } = useAuth();
   const [tab, setTab] = useState("scan");
-  const [scan, setScan] = useState(null); // { token, patient, records }
+  const [scan, setScan] = useState(null);
 
   function handlePatientLoaded(data) {
     setScan(data);
@@ -20,7 +20,6 @@ export default function DoctorDashboard() {
   }
 
   function handlePrescriptionSaved() {
-    // Refresh the patient's records on screen
     if (scan) {
       setScan({ ...scan, records: [...scan.records] });
     }
