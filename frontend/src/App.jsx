@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
+import ChatBot from "./components/ChatBot";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -16,11 +18,13 @@ function RequireRole({ role, children }) {
 }
 
 export default function App() {
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
   return (
     <AuthProvider>
       <BrowserRouter>
         <div className="page">
-          <Navbar />
+          <Navbar onOpenChat={() => setIsChatOpen(true)} />
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
@@ -43,6 +47,7 @@ export default function App() {
             />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          <ChatBot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
         </div>
       </BrowserRouter>
     </AuthProvider>
