@@ -9,56 +9,63 @@ export default function QRScanner({ onPatientLoaded }) {
   const scannerRef = useRef(null);
   const containerId = "qr-reader-container";
 
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      stopCamera();
+      if (scannerRef.current) {
+        scannerRef.current.stop().catch(() => {});
+        scannerRef.current.clear().catch(() => {});
+      }
     };
   }, []);
 
-  async function startCamera() {
-    setErr("");
-    setMode("scanning");
-    try {
-      // Check if browser supports camera at all
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error("Camera API not supported in this browser. Use HTTPS.");
-      }
+  // Start camera when mode changes to scanning
+  useEffect(() => {
+    if (mode !== "scanning") return;
 
-      const scanner = new Html5Qrcode(containerId);
-      scannerRef.current = scanner;
-      await scanner.start(
+    let isMounted = true;
+    const scanner = new Html5Qrcode(containerId);
+    scannerRef.current = scanner;
+
+    scanner
+      .start(
         { facingMode: "environment" },
         { fps: 10, qrbox: { width: 250, height: 250 } },
         async (decodedText) => {
-          await stopCamera();
-          await verifyToken(decodedText);
+          if (!isMounted) return;
+          await scanner.stop().catch(() => {});
+          await scanner.clear().catch(() => {});
+          setMode("idle");
+          verifyToken(decodedText);
         },
         () => {}
-      );
-    } catch (e) {
-      console.error("Camera error:", e);
-      // Show specific error to user
-      if (e.name === "NotAllowedError" || e.message.includes("Permission")) {
-        setErr("Camera permission denied. Please allow camera access in your browser settings (click the lock icon in the URL bar).");
-      } else if (e.name === "NotFoundError" || e.name === "DevicesNotFoundError") {
-        setErr("No camera found on this device.");
-      } else if (e.name === "NotReadableError" || e.name === "TrackStartError") {
-        setErr("Camera is already in use by another app. Close other apps and try again.");
-      } else {
-        setErr(`Could not start camera: ${e.message || "Unknown error"}. Try manual entry below.`);
-      }
-      setMode("idle");
-    }
-  }
+      )
+      .catch((e) => {
+        if (!isMounted) return;
+        console.error("Camera error:", e);
+        if (e.name === "NotAllowedError" || e.message?.includes("Permission")) {
+          setErr("Camera permission denied. Please allow camera access in your browser settings.");
+        } else if (e.name === "NotFoundError") {
+          setErr("No camera found on this device.");
+        } else {
+          setErr(`Could not start camera: ${e.message || "Unknown error"}. Try manual entry below.`);
+        }
+        setMode("idle");
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [mode]);
 
   async function stopCamera() {
-    try {
-      if (scannerRef.current) {
+    if (scannerRef.current) {
+      try {
         await scannerRef.current.stop();
         await scannerRef.current.clear();
         scannerRef.current = null;
-      }
-    } catch (_) {}
+      } catch (_) {}
+    }
     setMode("idle");
   }
 
@@ -95,31 +102,32 @@ export default function QRScanner({ onPatientLoaded }) {
 
       <div className="scanner-layout mt-48">
         <div className="scanner-box">
-          {mode === "scanning" ? (
-            <>
-              <div id={containerId} className="scanner-video" />
-              <button className="btn btn--ghost mt-24" onClick={stopCamera}>
-                Stop camera
-              </button>
-            </>
-          ) : (
-            <>
-              <div className="scanner-placeholder">
-                <div className="scanner-frame">
-                  <div className="scanner-corners" />
-                  <div className="mono muted" style={{ textAlign: "center" }}>
-                    {mode === "loading" ? "Verifying…" : "Camera off"}
-                  </div>
+          {/* Container must ALWAYS be in DOM, html5-qrcode injects video here */}
+          <div id={containerId} className="scanner-video" style={{ display: mode === "scanning" ? "block" : "none" }} />
+          
+          {mode !== "scanning" && (
+            <div className="scanner-placeholder">
+              <div className="scanner-frame">
+                <div className="scanner-corners" />
+                <div className="mono muted" style={{ textAlign: "center" }}>
+                  {mode === "loading" ? "Verifying…" : "Camera off"}
                 </div>
               </div>
-              <button
-                className="btn mt-24"
-                onClick={startCamera}
-                disabled={mode === "loading"}
-              >
-                {mode === "loading" ? "Verifying…" : "Open camera →"}
-              </button>
-            </>
+            </div>
+          )}
+
+          {mode === "scanning" ? (
+            <button className="btn btn--ghost mt-24" onClick={stopCamera}>
+              Stop camera
+            </button>
+          ) : (
+            <button
+              className="btn mt-24"
+              onClick={() => setMode("scanning")}
+              disabled={mode === "loading"}
+            >
+              {mode === "loading" ? "Verifying…" : "Open camera →"}
+            </button>
           )}
         </div>
 
