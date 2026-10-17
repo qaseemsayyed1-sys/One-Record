@@ -19,6 +19,11 @@ export default function QRScanner({ onPatientLoaded }) {
     setErr("");
     setMode("scanning");
     try {
+      // Check if browser supports camera at all
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("Camera API not supported in this browser. Use HTTPS.");
+      }
+
       const scanner = new Html5Qrcode(containerId);
       scannerRef.current = scanner;
       await scanner.start(
@@ -31,7 +36,17 @@ export default function QRScanner({ onPatientLoaded }) {
         () => {}
       );
     } catch (e) {
-      setErr("Could not start camera. Use manual entry below.");
+      console.error("Camera error:", e);
+      // Show specific error to user
+      if (e.name === "NotAllowedError" || e.message.includes("Permission")) {
+        setErr("Camera permission denied. Please allow camera access in your browser settings (click the lock icon in the URL bar).");
+      } else if (e.name === "NotFoundError" || e.name === "DevicesNotFoundError") {
+        setErr("No camera found on this device.");
+      } else if (e.name === "NotReadableError" || e.name === "TrackStartError") {
+        setErr("Camera is already in use by another app. Close other apps and try again.");
+      } else {
+        setErr(`Could not start camera: ${e.message || "Unknown error"}. Try manual entry below.`);
+      }
       setMode("idle");
     }
   }
