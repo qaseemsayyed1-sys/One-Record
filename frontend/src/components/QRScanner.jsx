@@ -30,7 +30,11 @@ export default function QRScanner({ onPatientLoaded }) {
     scanner
       .start(
         { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
+        {
+          fps: 15, // Faster scanning
+          qrbox: { width: 300, height: 300 }, // Bigger scanning area
+          aspectRatio: 1.0,
+        },
         async (decodedText) => {
           if (!isMounted) return;
           await scanner.stop().catch(() => {});
@@ -38,7 +42,9 @@ export default function QRScanner({ onPatientLoaded }) {
           setMode("idle");
           verifyToken(decodedText);
         },
-        () => {}
+        () => {
+          // Ignore scan failures (fires constantly when no QR in frame)
+        }
       )
       .catch((e) => {
         if (!isMounted) return;
@@ -103,7 +109,11 @@ export default function QRScanner({ onPatientLoaded }) {
       <div className="scanner-layout mt-48">
         <div className="scanner-box">
           {/* Container must ALWAYS be in DOM, html5-qrcode injects video here */}
-          <div id={containerId} className="scanner-video" style={{ display: mode === "scanning" ? "block" : "none" }} />
+          <div 
+            id={containerId} 
+            className="scanner-video" 
+            style={{ display: mode === "scanning" ? "block" : "none" }} 
+          />
           
           {mode !== "scanning" && (
             <div className="scanner-placeholder">
